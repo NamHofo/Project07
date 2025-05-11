@@ -2,6 +2,7 @@
 
 WITH checkout_data AS (
   SELECT
+    CAST(FARM_FINGERPRINT(CONCAT(CAST(order_id AS STRING), CAST(product_id AS STRING))) AS STRING) AS fact_id,
     order_id,
     time_stamp,
     local_time,
@@ -24,6 +25,7 @@ WITH checkout_data AS (
 )
 
 SELECT
+  fact_id,
   order_id,
   CAST(FARM_FINGERPRINT(CONCAT(CAST(time_stamp AS STRING), CAST(local_time AS STRING))) AS STRING) AS time_id,
   user_id_db,
@@ -32,7 +34,6 @@ SELECT
   store_id,
   total_price,
   quantity,
-  is_paypal,
-  cart_product_count
+  is_paypal
 FROM checkout_data
 WHERE total_price IS NOT NULL

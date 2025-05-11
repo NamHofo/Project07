@@ -10,7 +10,7 @@ WITH time_data AS (
 
 SELECT
   -- Tạo khóa chính duy nhất (time_id) dựa trên time_stamp
-  CAST(FARM_FINGERPRINT(CONCAT(CAST(time_stamp AS STRING), CAST(local_time AS STRING))) AS STRING) AS time_id,
+  CAST(FARM_FINGERPRINT(CONCAT(CAST(time_stamp AS STRING), CAST(local_time AS STRING))) AS STRING) AS date_id,
   EXTRACT(YEAR FROM time_stamp) AS year,
   EXTRACT(MONTH FROM time_stamp) AS month,
   EXTRACT(DAY FROM time_stamp) AS day,
