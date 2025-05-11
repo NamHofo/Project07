@@ -2,4 +2,5 @@
 
 SELECT
     *
-FROM {{ ref('stg_user') }}
+FROM
+    {{ref('stg_location')}}

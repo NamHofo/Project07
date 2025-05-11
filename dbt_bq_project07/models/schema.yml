@@ -6,8 +6,94 @@ sources:
     schema: summary_your_dataset      
     tables:
       - name: change_data_type  
+      - name: product_name_crawl
+      - name: ip2_location
 
 models:
+# Schema for staging dimesion tables
+  - name: stg_date
+    description: "Staging view for user data"
+  - name: stg_product
+    description: "Staging view for product data"
+  - name: stg_location
+    description: "Staging view for location data"
+
+#Schema for staging  fact tables
+  - name: stg_change_data_type
+    description: "Staging model for cleaned and transformed change_data_type data"
+    columns:
+      - name: order_id
+        description: "Order ID"
+        tests:
+          - not_null
+      - name: time_stamp
+        description: "Timestamp of the event"
+        tests:
+          - not_null
+      - name: local_time
+        description: "Local datetime of the event"
+      - name: user_id_db
+        description: "User ID"
+        tests:
+          - not_null
+      - name: device_id
+        description: "Device ID"
+      - name: ip
+        description: "IP address"
+      - name: user_agent
+        description: "User agent string"
+      - name: resolution
+        description: "Screen resolution"
+      - name: api_version
+        description: "API version"
+      - name: store_id
+        description: "Store ID"
+      - name: product_id
+        description: "Product ID"
+      - name: cat_id
+        description: "Category ID"
+      - name: collect_id
+        description: "Collection ID"
+      - name: viewing_product_id
+        description: "Viewed product ID"
+      - name: recommendation_product_id
+        description: "Recommended product ID"
+      - name: recommendation_clicked_position
+        description: "Position of clicked recommendation"
+      - name: price
+        description: "Price of the event"
+      - name: currency
+        description: "Currency of the price"
+      - name: is_paypal
+        description: "Payment method indicator"
+      - name: utm_source
+        description: "UTM source"
+      - name: utm_medium
+        description: "UTM medium"
+      - name: current_url
+        description: "Current URL"
+      - name: referrer_url
+        description: "Referring URL"
+      - name: key_search
+        description: "Search keyword"
+      - name: email_address
+        description: "Email address"
+      - name: show_recommendation
+        description: "Show recommendation status"
+      - name: recommendation
+        description: "Recommendation type"
+      - name: cart_products
+        description: "Array of cart products"
+        tests:
+          - not_null
+      - name: options
+        description: "Array of product options"
+      - name: collection
+        description: "Collection type"
+        tests:
+          - not_null
+    
+#Schema for dimensions and facts
   - name: dim_product
     description: "Dimension table for product information"
     columns:
@@ -16,6 +102,7 @@ models:
         tests:
           - not_null
           - unique
+          
   - name: dim_user
     description: "Dimension table for user information"
     columns:
@@ -29,26 +116,14 @@ models:
         tests:
           - not_null
           - unique
-  - name: dim_store
-    description: "Dimension table for store information"
-    columns:
-        - name: store_id
-          description: "Unique identifier for the store"
-          tests:
-            - not_null
-            - unique
-  - name: dim_time
-    description: "Dimension table for time information extracted from timestamps"
+  - name: dim_date
+    description: "Dimension table for time information extracted"
     columns:
         - name: time_id
           description: "Unique identifier for each time entry"
           tests:
             - not_null
             - unique
-        - name: time_stamp
-          description: "Original timestamp from the source"
-        - name: local_time
-          description: "Local datetime from the source"
         - name: year
           description: "Year extracted from timestamp"
           tests:
@@ -76,79 +151,13 @@ models:
         - name: quarter
           description: "Quarter of the year"
           tests:
+
             - not_null
         - name: day_of_week
           description: "Day of the week (e.g., Monday)"
           tests:
             - not_null
-  - name: dim_order
-    description: "Dimension table for order information"
-    columns:
-        - name: order_id
-          description: "Unique identifier for the order"
-          tests:
-            - not_null
-            - unique
-        - name: is_paypal
-          description: "Indicates if the order was paid via PayPal"
-          tests:
-            - not_null
-  - name: dim_recommendation
-    description: "Dimension table for recommendation information"
-    columns:
-        - name: recommendation_id
-          description: "Unique identifier for the recommendation"
-          tests:
-            - not_null
-            - unique
-        - name: recommendation
-          description: "Type or content of the recommendation"
-        - name: recommendation_product_id
-          description: "Product ID recommended"
-          tests:
-            - not_null
-        - name: recommendation_clicked_position
-          description: "Position where the recommendation was clicked"
-        - name: show_recommendation
-          description: "Status of recommendation display"
-  - name: dim_marketing
-    description: "Dimension table for marketing and traffic source information"
-    columns:
-        - name: marketing_id
-          description: "Unique identifier for the marketing entry"
-          tests:
-            - not_null
-            - unique
-        - name: utm_source
-          description: "Source of the traffic"
-        - name: utm_medium
-          description: "Medium of the traffic"
-        - name: current_url
-          description: "Current URL visited"
-        - name: referrer_url
-          description: "Referring URL"
-  - name: dim_cart_product
-    description: "Dimension table for products in the cart"
-    columns:
-        - name: cart_product_id
-          description: "Unique identifier for the cart product entry"
-          tests:
-            - not_null
-            - unique
-        - name: product_id
-          description: "Product ID in the cart"
-          tests:
-            - not_null
-        - name: amount
-          description: "Amount of the product in the cart"
-        - name: price
-          description: "Price of the product"
-        - name: currency
-          description: "Currency of the price"
-        - name: option_id
-          description: "Option ID for the product variant"
-        - name: option_label
-          description: "Label of the option"
+  
   - name: fact_checkout_success
     description: "Fact table for successful checkout events"
     columns:
@@ -189,125 +198,23 @@ models:
           description: "Number of products in the cart"
           tests:
             - not_null
-  - name: fact_product_views
-    description: "Fact table for product view events"
+  - name: dim_location
+    description: "Dimension table for location information"
     columns:
-        - name: fact_id
-          description: "Unique identifier for the fact entry"
+        - name: ip
+          description: "IP address"
           tests:
             - not_null
-            - unique
-        - name: time_id
-          description: "Time ID linked to dim_time"
+        - name: country
+          description: "Country "
           tests:
             - not_null
-        - name: user_id_db
-          description: "User ID linked to dim_user"
+        - name: region
+          description: "Region"
           tests:
             - not_null
-        - name: product_id
-          description: "Product ID linked to dim_product"
+        - name: city
+          description: "City"
           tests:
             - not_null
-        - name: store_id
-          description: "Store ID linked to dim_store"
-        - name: view_count
-          description: "Number of times the product was viewed"
-          tests:
-            - not_null
-  - name: fact_recommendation_clicks
-    description: "Fact table for recommendation click events"
-    columns:
-        - name: fact_id
-          description: "Unique identifier for the fact entry"
-          tests:
-            - not_null
-            - unique
-        - name: time_id
-          description: "Time ID linked to dim_time"
-          tests:
-            - not_null
-        - name: user_id_db
-          description: "User ID linked to dim_user"
-          tests:
-            - not_null
-        - name: recommendation_id
-          description: "Recommendation ID linked to dim_recommendation"
-          tests:
-            - not_null
-        - name: click_count
-          description: "Number of clicks on the recommendation"
-          tests:
-          - not_null
-  - name: fact_search_activity
-    description: "Fact table for search activity events"
-    columns:
-        - name: fact_id
-          description: "Unique identifier for the fact entry"
-          tests:
-            - not_null
-            - unique
-        - name: time_id
-          description: "Time ID linked to dim_time"
-          tests:
-            - not_null
-        - name: user_id_db
-          description: "User ID linked to dim_user"
-          tests:
-            - not_null
-        - name: key_search
-          description: "Search keyword used by the user"
-          tests:
-            - not_null
-        - name: search_count
-          description: "Number of searches performed"
-          tests:
-            - not_null
-  - name: fact_cart_activity
-    description: "Fact table for add-to-cart activity events"
-    columns:
-        - name: fact_id
-          description: "Unique identifier for the fact entry"
-          tests:
-            - not_null
-            - unique
-        - name: time_id
-          description: "Time ID linked to dim_time"
-          tests:
-            - not_null
-        - name: user_id_db
-          description: "User ID linked to dim_user"
-          tests:
-            - not_null
-        - name: cart_product_id
-          description: "Cart product ID linked to dim_cart_product"
-          tests:
-            - not_null
-        - name: add_to_cart_count
-          description: "Number of times the product was added to cart"
-          tests:
-            - not_null
-  - name: fact_traffic_source
-    description: "Fact table for traffic source events"
-    columns:
-        - name: fact_id
-          description: "Unique identifier for the fact entry"
-          tests:
-            - not_null
-            - unique
-        - name: time_id
-          description: "Time ID linked to dim_time"
-          tests:
-            - not_null
-        - name: user_id_db
-          description: "User ID linked to dim_user"
-          tests:
-            - not_null
-        - name: marketing_id
-          description: "Marketing ID linked to dim_marketing"
-          tests:
-            - not_null
-        - name: visit_count
-          description: "Number of visits from the traffic source"
-          tests:
-            - not_null
+  

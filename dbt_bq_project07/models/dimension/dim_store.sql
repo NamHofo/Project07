@@ -1,6 +1,9 @@
-{{config(materialized='table')}}
+{{ config(materialized='table',) }}
 
-SELECT
+SELECT  
     store_id
-FROM 
-    {{ source('summary_your_dataset', 'change_data_type') }}
+FROM
+    {{ ref('stg_change_data_type') }}
+WHERE
+    store_id IS NOT NULL
+
