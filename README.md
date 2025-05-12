@@ -258,4 +258,4 @@ dbt run --select fact_checkout_success
     
     Email: hofonam24@gmail.com
 
-![gvto.svg](https://prod-files-secure.s3.us-west-2.amazonaws.com/c67a89a4-f41d-4526-a34a-07c24c1e7fb7/b2796a21-acbc-4bb6-8865-0b5af6a5afe1/gvto.svg)
+![gvto.svg](https://github.com/NamHofo/Project07/blob/main/gvto.svg)
